@@ -1,0 +1,66 @@
+import { useRef } from "react";
+
+export default function CanvasExample() {
+    const canvasSize = 500;
+    const canvas = useRef();
+    const color = useRef("#000000");
+    const size = useRef(5);
+
+    console.log("render");
+
+    const placeDot = (x, y, clear) => {
+        let ctx = canvas.current.getContext("2d");
+        ctx.fillStyle = clear ? "#fff" : color.current;
+        ctx.fillRect(x, y, size.current, size.current);
+    };
+
+    const fillArea = (x, y) => {
+        console.log(canvas.current.getContext("2d").getImageData(0, 0, canvasSize, canvasSize));
+    };
+
+
+
+    return (
+        <>
+            <p>Lorem ipsum</p>
+            <canvas
+                ref={canvas}
+                width={canvasSize}
+                height={canvasSize}
+                style={{ border: "1px solid black" }}
+                onClick={e => {
+                    if (e.ctrlKey) {
+                        fillArea(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop);
+                    }
+                }}
+                onContextMenu={e => e.preventDefault()}
+                onMouseDown={e =>  { if (e.button === 2) {
+                    let ctx = canvas.current.getContext("2d");
+                    ctx.fillStyle = "#000000";
+                    ctx.fillRect(0, 0, canvasSize, canvasSize);
+                }}} // Handle mouse down
+                onMouseMove={e => {
+                    if (e.buttons === 1) {
+                        placeDot(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop, e.buttons === 2);
+                    }
+                }}
+            />
+            <input
+                type={"color"}
+                defaultValue={color.current}
+                onChange={e => {
+                    color.current = e.target.value;
+                }}
+            />
+            <input
+                type={"range"}
+                min={1}
+                max={50}
+                defaultValue={size.current}
+                onChange={e => {
+                    size.current = e.target.value;
+                }}
+            />
+        </>
+    );
+}
